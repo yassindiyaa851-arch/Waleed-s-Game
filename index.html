@@ -1,0 +1,757 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bubble Sort - Smooth Game</title>
+
+<style>
+:root {
+  --bg: #080d18;
+  --panel: #101a2b;
+  --gold: #ffd84d;
+  --blue: #1766c2;
+  --text: #f4f7ff;
+  --muted: #9eacc2;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    #172943 0,
+    #080d18 55%
+  );
+  color: var(--text);
+  font-family: system-ui, Tahoma, sans-serif;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.app {
+  width: min(920px, 100%);
+}
+
+header {
+  text-align: center;
+  margin: 8px 0 18px;
+}
+
+h1 {
+  font-size: clamp(2rem, 6vw, 3.4rem);
+  margin: 0;
+  font-weight: 900;
+}
+
+h1 span {
+  color: var(--gold);
+}
+
+.sub {
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.panel {
+  background: linear-gradient(180deg,#0d1728,#080e19);
+  border: 1px solid #26354c;
+  border-radius: 22px;
+  padding: 14px;
+  box-shadow: 0 20px 60px #0008;
+}
+
+.stats {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.stat {
+  background: #111e32;
+  border: 1px solid #263750;
+  border-radius: 12px;
+  padding: 8px 13px;
+  color: var(--muted);
+}
+
+.stat b {
+  color: white;
+  margin-inline-start: 5px;
+}
+
+/* منطقة اللعبة */
+
+.stage {
+  height: 340px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: clamp(4px,1.6vw,14px);
+  padding: 28px 10px 22px;
+  border-radius: 16px;
+  background: linear-gradient(
+    180deg,
+    #07101e,
+    #0b1524 80%,
+    #111827
+  );
+  border: 1px solid #1b2b42;
+  overflow: hidden;
+  position: relative;
+}
+
+.stage::after {
+  content: "";
+  position: absolute;
+  bottom: 18px;
+  left: 5%;
+  right: 5%;
+  height: 3px;
+  background: #344258;
+  border-radius: 50%;
+}
+
+/* الشخصيات */
+
+.person {
+  position: relative;
+  width: clamp(34px,8vw,76px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+  flex: 0 1 auto;
+
+  transition:
+    transform .55s cubic-bezier(.2,.75,.25,1);
+
+  will-change: transform;
+}
+
+.num {
+  font-size: clamp(14px,2.5vw,22px);
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.body {
+  height: var(--h);
+  width: 82%;
+  min-height: 62px;
+
+  transition:
+    height .55s cubic-bezier(.2,.75,.25,1),
+    filter .25s ease;
+
+  background: linear-gradient(
+    90deg,
+    #d9a900,
+    #ffe65a 35%,
+    #f4c900
+  );
+
+  border-radius: 48% 48% 24% 24%;
+  position: relative;
+
+  box-shadow:
+    inset -7px 0 9px #9c730088,
+    0 7px 12px #0008;
+}
+
+.body::before {
+  content: "";
+  position: absolute;
+  top: 18%;
+  left: 18%;
+  width: 64%;
+  height: 23%;
+  border-radius: 20px;
+  background: #f7f5dc;
+  border: 3px solid #2c3542;
+}
+
+.eye {
+  position: absolute;
+  top: 21%;
+  left: 29%;
+  width: 14%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #384252;
+  z-index: 2;
+}
+
+.eye::after {
+  content: "";
+  position: absolute;
+  width: 35%;
+  height: 35%;
+  border-radius: 50%;
+  background: #25374b;
+  top: 32%;
+  left: 32%;
+}
+
+.eye.two {
+  left: 53%;
+}
+
+.mouth {
+  position: absolute;
+  top: 43%;
+  left: 39%;
+  width: 22%;
+  height: 9%;
+  border-bottom: 2px solid #543b16;
+  border-radius: 50%;
+}
+
+.overalls {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 31%;
+  background: linear-gradient(
+    90deg,
+    #07438e,
+    #1477d9 45%,
+    #06428b
+  );
+  border-radius: 0 0 12px 12px;
+  border-top: 4px solid #063a79;
+}
+
+.overalls::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 33%;
+  width: 34%;
+  height: 16px;
+  background: #0b4b9a;
+  border-radius: 4px;
+}
+
+.legs {
+  display: flex;
+  gap: 12px;
+  margin-top: -1px;
+}
+
+.legs i {
+  display: block;
+  width: 9px;
+  height: 13px;
+  background: #172236;
+  border-radius: 0 0 5px 5px;
+}
+
+.person.active .body {
+  filter: drop-shadow(0 0 12px #ffdb4d);
+}
+
+.person.active {
+  z-index: 3;
+}
+
+.person.done .body {
+  filter: drop-shadow(0 0 10px #45d483);
+}
+
+/* الأزرار */
+
+.controls {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 15px 0 10px;
+}
+
+button {
+  border: 0;
+  border-radius: 12px;
+  padding: 11px 18px;
+  font-size: 1rem;
+  font-weight: 750;
+  cursor: pointer;
+  background: #1b2b43;
+  color: white;
+}
+
+button.primary {
+  background: linear-gradient(135deg,#ffd84d,#f0aa16);
+  color: #1b1b1b;
+}
+
+button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.speed {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  color: var(--muted);
+  margin: 10px;
+}
+
+input {
+  accent-color: #ffd84d;
+}
+
+/* عرض الكود */
+
+.code {
+  margin-top: 12px;
+  background: #050a12;
+  border: 1px solid #1d2b40;
+  border-radius: 14px;
+  padding: 13px;
+  direction: ltr;
+  text-align: left;
+  overflow: auto;
+  font: 14px/1.8 monospace;
+  color: #c8d5e8;
+}
+
+.line {
+  display: block;
+  padding: 0 8px;
+  border-radius: 5px;
+  white-space: pre;
+}
+
+.line.hot {
+  background: #06472f;
+  color: #eafff3;
+}
+
+.kw {
+  color: #8ab4ff;
+}
+
+.message {
+  text-align: center;
+  color: var(--muted);
+  min-height: 26px;
+  margin: 9px 0;
+}
+
+@media(max-width:520px) {
+  .stage {
+    height: 285px;
+    padding-bottom: 20px;
+  }
+
+  .panel {
+    padding: 9px;
+  }
+
+  button {
+    padding: 10px 13px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .person,
+  .body {
+    transition: none !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<main class="app">
+
+<header>
+  <h1>BUBBLE <span>SORT</span></h1>
+  <div class="sub">
+    رتّب الشخصيات من الأصغر إلى الأكبر ✨
+  </div>
+</header>
+
+<section class="panel">
+
+<div class="stats">
+  <div class="stat">المقارنات <b id="comparisons">0</b></div>
+  <div class="stat">التبديلات <b id="swaps">0</b></div>
+  <div class="stat">الجولة <b id="round">0</b></div>
+</div>
+
+<div class="stage" id="stage"></div>
+
+<div class="controls">
+  <button class="primary" id="play">▶ ابدأ الترتيب</button>
+  <button id="step">خطوة واحدة</button>
+  <button id="shuffle">خلط من جديد</button>
+</div>
+
+<div class="speed">
+  <label for="speed">سرعة الحركة</label>
+  <input id="speed" type="range" min="1" max="5" value="3">
+  <span id="speedLabel">متوسطة</span>
+</div>
+
+<div class="message" id="message">
+  اضغط ابدأ الترتيب وشاهد الخوارزمية.
+</div>
+
+<div class="code">
+
+<span class="line" id="c1">
+<span class="kw">for</span> (let p = 0; p &lt; a.length - 1; p++) {
+</span>
+
+<span class="line" id="c2">
+  <span class="kw">for</span> (let i = 0; i &lt; a.length - 1 - p; i++) {
+</span>
+
+<span class="line" id="c3">
+    <span class="kw">if</span> (a[i] &gt; a[i + 1]) {
+</span>
+
+<span class="line" id="c4">
+      [a[i], a[i + 1]] = [a[i + 1], a[i]];
+</span>
+
+<span class="line" id="c5">    }</span>
+<span class="line" id="c6">  }</span>
+<span class="line" id="c7">}</span>
+
+</div>
+
+</section>
+</main>
+
+<script>
+
+const stage = document.getElementById("stage");
+const $ = id => document.getElementById(id);
+
+let values = [1,4,9,3,2,6,5,8];
+
+let i = 0;
+let p = 0;
+let comparisons = 0;
+let swaps = 0;
+
+let running = false;
+let finished = false;
+let timer = null;
+
+const delay = () =>
+[1400,1100,850,650,560][$("speed").value - 1];
+
+const names = [
+"بطيئة جداً",
+"بطيئة",
+"متوسطة",
+"سريعة",
+"سريعة جداً"
+];
+
+$("speed").addEventListener("input", () => {
+  $("speedLabel").textContent =
+  names[$("speed").value - 1];
+});
+
+const nodes = new Map();
+
+/* إنشاء شخصية */
+
+function makePerson(v) {
+
+  const el = document.createElement("div");
+
+  el.className = "person";
+
+  el.innerHTML = `
+    <div class="num">${v}</div>
+
+    <div class="body">
+      <i class="eye"></i>
+      <i class="eye two"></i>
+      <i class="mouth"></i>
+      <div class="overalls"></div>
+    </div>
+
+    <div class="legs">
+      <i></i>
+      <i></i>
+    </div>
+  `;
+
+  return el;
+}
+
+/* رسم الشخصيات وتحريكها بسلاسة */
+
+function draw(active = -1, second = -1) {
+
+  const oldPositions = new Map();
+
+  for (const v of values) {
+
+    const node = nodes.get(v);
+
+    if (node) {
+      oldPositions.set(
+        v,
+        node.getBoundingClientRect().left
+      );
+    }
+  }
+
+  for (const v of values) {
+
+    let el = nodes.get(v);
+
+    if (!el) {
+
+      el = makePerson(v);
+
+      nodes.set(v, el);
+
+      stage.appendChild(el);
+    }
+
+    el.style.order = values.indexOf(v);
+
+    el.querySelector(".num").textContent = v;
+
+    el.querySelector(".body").style.setProperty(
+      "--h",
+      (72 + v * 19) + "px"
+    );
+
+    el.classList.toggle(
+      "active",
+      values.indexOf(v) === active ||
+      values.indexOf(v) === second
+    );
+
+    el.classList.toggle("done", finished);
+  }
+
+  // FLIP Animation
+
+  for (const v of values) {
+
+    const el = nodes.get(v);
+
+    const before = oldPositions.get(v);
+
+    if (before === undefined) continue;
+
+    const after = el.getBoundingClientRect().left;
+
+    const delta = before - after;
+
+    if (Math.abs(delta) > 1) {
+
+      el.style.transition = "none";
+
+      el.style.transform =
+      `translateX(${delta}px)`;
+
+      el.getBoundingClientRect();
+
+      requestAnimationFrame(() => {
+
+        el.style.transition = "";
+
+        el.style.transform = "translateX(0)";
+
+      });
+    }
+  }
+
+  $("comparisons").textContent = comparisons;
+  $("swaps").textContent = swaps;
+  $("round").textContent = p + 1;
+}
+
+/* تمييز سطر الكود */
+
+function highlight(line) {
+
+  for (let n = 1; n <= 7; n++) {
+
+    $("c" + n).classList.toggle(
+      "hot",
+      n === line
+    );
+  }
+}
+
+/* إيقاف */
+
+function stop() {
+
+  running = false;
+
+  clearTimeout(timer);
+
+  $("play").textContent = "▶ أكمل الترتيب";
+}
+
+/* خطوة واحدة من الخوارزمية */
+
+function step() {
+
+  if (finished) return;
+
+  if (i >= values.length - 1 - p) {
+
+    p++;
+
+    i = 0;
+
+    if (p >= values.length - 1) {
+
+      finished = true;
+
+      draw();
+
+      highlight(7);
+
+      $("message").textContent =
+      "🎉 أحسنت! صارت الأرقام مرتبة.";
+
+      stop();
+
+      $("play").disabled = true;
+
+      return;
+    }
+  }
+
+  comparisons++;
+
+  highlight(3);
+
+  const shouldSwap =
+  values[i] > values[i + 1];
+
+  if (shouldSwap) {
+
+    [values[i], values[i + 1]] =
+    [values[i + 1], values[i]];
+
+    swaps++;
+
+    highlight(4);
+
+    $("message").textContent =
+    "تم تبديل الشخصيتين!";
+  }
+
+  else {
+
+    $("message").textContent =
+    "لا نحتاج إلى تبديل.";
+  }
+
+  draw(i, shouldSwap ? i + 1 : -1);
+
+  i++;
+}
+
+/* التشغيل التلقائي */
+
+function play() {
+
+  if (finished) return;
+
+  running = true;
+
+  $("play").textContent = "Ⅱ إيقاف مؤقت";
+
+  function tick() {
+
+    if (!running) return;
+
+    step();
+
+    if (running && !finished) {
+
+      timer = setTimeout(tick, delay());
+    }
+  }
+
+  tick();
+}
+
+/* زر التشغيل */
+
+$("play").addEventListener("click", () => {
+
+  running ? stop() : play();
+
+});
+
+/* زر خطوة واحدة */
+
+$("step").addEventListener("click", () => {
+
+  stop();
+
+  step();
+
+});
+
+/* خلط الأرقام */
+
+$("shuffle").addEventListener("click", () => {
+
+  stop();
+
+  values = Array.from(
+    {length: 8},
+    (_, n) => n + 1
+  ).sort(() => Math.random() - 0.5);
+
+  i = 0;
+  p = 0;
+
+  comparisons = 0;
+  swaps = 0;
+
+  finished = false;
+
+  $("play").disabled = false;
+
+  $("play").textContent = "▶ ابدأ الترتيب";
+
+  $("message").textContent =
+  "تم خلط الأرقام. جاهز للتحدي؟";
+
+  highlight(0);
+
+  draw();
+
+});
+
+/* بداية اللعبة */
+
+draw();
+
+</script>
+
+</body>
+</html>
