@@ -4,754 +4,384 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bubble Sort - Smooth Game</title>
-
+<title>Bubble Sort — Algo Lab</title>
 <style>
-:root {
-  --bg: #080d18;
-  --panel: #101a2b;
-  --gold: #ffd84d;
-  --blue: #1766c2;
-  --text: #f4f7ff;
-  --muted: #9eacc2;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  background: radial-gradient(
-    ellipse at 50% 0%,
-    #172943 0,
-    #080d18 55%
-  );
-  color: var(--text);
-  font-family: system-ui, Tahoma, sans-serif;
-  display: grid;
-  place-items: center;
-  padding: 18px;
-}
-
-.app {
-  width: min(920px, 100%);
-}
-
-header {
-  text-align: center;
-  margin: 8px 0 18px;
-}
-
-h1 {
-  font-size: clamp(2rem, 6vw, 3.4rem);
-  margin: 0;
-  font-weight: 900;
-}
-
-h1 span {
-  color: var(--gold);
-}
-
-.sub {
-  color: var(--muted);
-  margin-top: 4px;
-}
-
-.panel {
-  background: linear-gradient(180deg,#0d1728,#080e19);
-  border: 1px solid #26354c;
-  border-radius: 22px;
-  padding: 14px;
-  box-shadow: 0 20px 60px #0008;
-}
-
-.stats {
-  display: flex;
-  gap: 10px;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
-}
-
-.stat {
-  background: #111e32;
-  border: 1px solid #263750;
-  border-radius: 12px;
-  padding: 8px 13px;
-  color: var(--muted);
-}
-
-.stat b {
-  color: white;
-  margin-inline-start: 5px;
-}
-
-/* منطقة اللعبة */
-
-.stage {
-  height: 340px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: clamp(4px,1.6vw,14px);
-  padding: 28px 10px 22px;
-  border-radius: 16px;
-  background: linear-gradient(
-    180deg,
-    #07101e,
-    #0b1524 80%,
-    #111827
-  );
-  border: 1px solid #1b2b42;
-  overflow: hidden;
-  position: relative;
-}
-
-.stage::after {
-  content: "";
-  position: absolute;
-  bottom: 18px;
-  left: 5%;
-  right: 5%;
-  height: 3px;
-  background: #344258;
-  border-radius: 50%;
-}
-
-/* الشخصيات */
-
-.person {
-  position: relative;
-  width: clamp(34px,8vw,76px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  z-index: 1;
-  flex: 0 1 auto;
-
-  transition:
-    transform .55s cubic-bezier(.2,.75,.25,1);
-
-  will-change: transform;
-}
-
-.num {
-  font-size: clamp(14px,2.5vw,22px);
-  font-weight: 800;
-  margin-bottom: 8px;
-}
-
-.body {
-  height: var(--h);
-  width: 82%;
-  min-height: 62px;
-
-  transition:
-    height .55s cubic-bezier(.2,.75,.25,1),
-    filter .25s ease;
-
-  background: linear-gradient(
-    90deg,
-    #d9a900,
-    #ffe65a 35%,
-    #f4c900
-  );
-
-  border-radius: 48% 48% 24% 24%;
-  position: relative;
-
-  box-shadow:
-    inset -7px 0 9px #9c730088,
-    0 7px 12px #0008;
-}
-
-.body::before {
-  content: "";
-  position: absolute;
-  top: 18%;
-  left: 18%;
-  width: 64%;
-  height: 23%;
-  border-radius: 20px;
-  background: #f7f5dc;
-  border: 3px solid #2c3542;
-}
-
-.eye {
-  position: absolute;
-  top: 21%;
-  left: 29%;
-  width: 14%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: white;
-  border: 2px solid #384252;
-  z-index: 2;
-}
-
-.eye::after {
-  content: "";
-  position: absolute;
-  width: 35%;
-  height: 35%;
-  border-radius: 50%;
-  background: #25374b;
-  top: 32%;
-  left: 32%;
-}
-
-.eye.two {
-  left: 53%;
-}
-
-.mouth {
-  position: absolute;
-  top: 43%;
-  left: 39%;
-  width: 22%;
-  height: 9%;
-  border-bottom: 2px solid #543b16;
-  border-radius: 50%;
-}
-
-.overalls {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 31%;
-  background: linear-gradient(
-    90deg,
-    #07438e,
-    #1477d9 45%,
-    #06428b
-  );
-  border-radius: 0 0 12px 12px;
-  border-top: 4px solid #063a79;
-}
-
-.overalls::before {
-  content: "";
-  position: absolute;
-  top: -8px;
-  left: 33%;
-  width: 34%;
-  height: 16px;
-  background: #0b4b9a;
-  border-radius: 4px;
-}
-
-.legs {
-  display: flex;
-  gap: 12px;
-  margin-top: -1px;
-}
-
-.legs i {
-  display: block;
-  width: 9px;
-  height: 13px;
-  background: #172236;
-  border-radius: 0 0 5px 5px;
-}
-
-.person.active .body {
-  filter: drop-shadow(0 0 12px #ffdb4d);
-}
-
-.person.active {
-  z-index: 3;
-}
-
-.person.done .body {
-  filter: drop-shadow(0 0 10px #45d483);
-}
-
-/* الأزرار */
-
-.controls {
-  display: flex;
-  gap: 9px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin: 15px 0 10px;
-}
-
-button {
-  border: 0;
-  border-radius: 12px;
-  padding: 11px 18px;
-  font-size: 1rem;
-  font-weight: 750;
-  cursor: pointer;
-  background: #1b2b43;
-  color: white;
-}
-
-button.primary {
-  background: linear-gradient(135deg,#ffd84d,#f0aa16);
-  color: #1b1b1b;
-}
-
-button:disabled {
-  opacity: .45;
-  cursor: not-allowed;
-}
-
-.speed {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  justify-content: center;
-  color: var(--muted);
-  margin: 10px;
-}
-
-input {
-  accent-color: #ffd84d;
-}
-
-/* عرض الكود */
-
-.code {
-  margin-top: 12px;
-  background: #050a12;
-  border: 1px solid #1d2b40;
-  border-radius: 14px;
-  padding: 13px;
-  direction: ltr;
-  text-align: left;
-  overflow: auto;
-  font: 14px/1.8 monospace;
-  color: #c8d5e8;
-}
-
-.line {
-  display: block;
-  padding: 0 8px;
-  border-radius: 5px;
-  white-space: pre;
-}
-
-.line.hot {
-  background: #06472f;
-  color: #eafff3;
-}
-
-.kw {
-  color: #8ab4ff;
-}
-
-.message {
-  text-align: center;
-  color: var(--muted);
-  min-height: 26px;
-  margin: 9px 0;
-}
-
-@media(max-width:520px) {
-  .stage {
-    height: 285px;
-    padding-bottom: 20px;
-  }
-
-  .panel {
-    padding: 9px;
-  }
-
-  button {
-    padding: 10px 13px;
-  }
-}
-
-@media(prefers-reduced-motion:reduce) {
-  .person,
-  .body {
-    transition: none !important;
-  }
-}
+:root{--bg:#090d18;--panel:#111a2b;--line:#26344b;--text:#f3f6ff;--muted:#9eabc1;--yellow:#ffd43b;--cyan:#5ee7f7;--green:#5be39a}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% -15%,#1c3150 0,#0b1220 42%,var(--bg) 75%);color:var(--text);font-family:system-ui,Tahoma,Arial,sans-serif;padding:20px}
+.app{max-width:1100px;margin:auto}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+.brand{font-weight:900;letter-spacing:2px;color:var(--cyan);font-size:13px}
+h1{font-size:clamp(24px,4vw,38px);margin:5px 0}
+.sub{color:var(--muted);font-size:14px}
+.pill{border:1px solid var(--line);border-radius:999px;padding:8px 12px;color:var(--green);font-size:12px}
+.panel{background:linear-gradient(145deg,#141f33,#0e1727);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 18px 55px #0005}
+.topline{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.status{color:var(--cyan);font-weight:700;font-size:14px}
+.stage{height:330px;position:relative;overflow:hidden;border-radius:17px;border:1px solid #293951;background:linear-gradient(#0d1728,#0a1220);padding:20px 12px 34px}
+.stage:after{content:"";position:absolute;left:0;right:0;bottom:27px;height:2px;background:linear-gradient(90deg,transparent,#536783,transparent)}
+.track{position:absolute;left:3%;right:3%;top:38px;bottom:35px}
+.actor{position:absolute;bottom:0;width:9%;height:var(--h);transform:translateX(-50%);transition:left .62s cubic-bezier(.2,.8,.2,1),bottom .3s ease;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;z-index:2}
+.actor .number{font-size:13px;font-weight:900;color:#fff;margin-bottom:8px;text-shadow:0 2px 6px #000}
+.minion{width:clamp(34px,6vw,58px);height:clamp(62px,10vw,94px);border-radius:48% 48% 35% 35%;background:linear-gradient(110deg,#e6a900,#ffe65a 48%,#d99b00);border:2px solid #ffeb83;position:relative;box-shadow:inset -7px 0 10px #9a650055,0 7px 14px #0006;animation:bob 2s ease-in-out infinite}
+.actor:nth-child(even) .minion{animation-delay:-.8s}
+.goggle{position:absolute;top:24%;left:50%;transform:translateX(-50%);width:76%;height:24%;border-radius:20px;background:#aeb9c4;border:4px solid #53616e;display:flex;justify-content:center;align-items:center}
+.eye{width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid #52606e;position:relative}
+.eye:after{content:"";position:absolute;width:4px;height:4px;border-radius:50%;background:#172033;left:2px;top:2px}
+.mouth{position:absolute;top:55%;left:50%;transform:translateX(-50%);width:23%;height:8%;border-bottom:3px solid #70420b;border-radius:50%}
+.overalls{position:absolute;bottom:-1px;left:15%;width:70%;height:30%;background:#2765b9;border-radius:8px 8px 16px 16px;border:2px solid #16437e}
+.overalls:before{content:"";position:absolute;left:18%;right:18%;top:-9px;height:12px;border-top:5px solid #2765b9}
+.actor.active .minion{filter:drop-shadow(0 0 13px var(--cyan));transform:scale(1.08)}
+.actor.swapping .minion{filter:drop-shadow(0 0 16px var(--yellow))}
+.actor.sorted .minion{filter:drop-shadow(0 0 12px var(--green))}
+.actor.active{z-index:5}
+.controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+button{border:1px solid var(--line);background:#1b2940;color:var(--text);padding:11px 16px;border-radius:12px;font-weight:800;cursor:pointer;transition:.2s}
+button:hover{transform:translateY(-2px);border-color:var(--cyan)}
+button.primary{background:var(--yellow);border-color:var(--yellow);color:#1a1a1a}
+button:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.stat{background:#0b1423;border:1px solid var(--line);border-radius:14px;padding:12px}
+.stat small{color:var(--muted);display:block;font-size:12px}
+.stat strong{font-size:23px}
+.lower{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.box{background:#0b1423;border:1px solid var(--line);border-radius:16px;padding:15px;min-width:0}
+.box h3{margin:0 0 10px;font-size:15px}
+.code{direction:ltr;text-align:left;white-space:pre;overflow:auto;font:12px/1.8 ui-monospace,Consolas,monospace;color:#c4d1e5}
+.code span{display:block;padding:0 7px;border-radius:5px}
+.code .on{background:#27415b;color:#fff;outline:1px solid #5ee7f7}
+.settings{display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:13px;margin-top:12px}
+input[type=range]{accent-color:var(--cyan);width:120px}
+select{background:#17243a;color:white;border:1px solid var(--line);padding:8px;border-radius:9px}
+.hint{color:var(--muted);font-size:12px;margin-top:12px;line-height:1.7}
+@keyframes bob{0%,100%{margin-bottom:0}50%{margin-bottom:5px}}
+@media(max-width:700px){body{padding:12px}.stage{height:270px}.stats{grid-template-columns:repeat(2,1fr)}.lower{grid-template-columns:1fr}.actor{width:10%}}
 </style>
 </head>
-
 <body>
-
-<main class="app">
-
+<div class="app">
 <header>
-  <h1>BUBBLE <span>SORT</span></h1>
-  <div class="sub">
-    رتّب الشخصيات من الأصغر إلى الأكبر ✨
-  </div>
+<div>
+<div class="brand">ALGO LAB / SORTING VISUALIZER</div>
+<h1>Bubble Sort</h1>
+<div class="sub">شوف الخوارزمية وهي ترتّب العناصر خطوة بخطوة</div>
+</div>
+<div class="pill">● LIVE SIMULATION</div>
 </header>
 
 <section class="panel">
-
-<div class="stats">
-  <div class="stat">المقارنات <b id="comparisons">0</b></div>
-  <div class="stat">التبديلات <b id="swaps">0</b></div>
-  <div class="stat">الجولة <b id="round">0</b></div>
+<div class="topline">
+<strong>ساحة الترتيب</strong>
+<div class="status" id="status">جاهز — اضغط تشغيل</div>
 </div>
-
-<div class="stage" id="stage"></div>
+<div class="stage"><div class="track" id="track"></div></div>
 
 <div class="controls">
-  <button class="primary" id="play">▶ ابدأ الترتيب</button>
-  <button id="step">خطوة واحدة</button>
-  <button id="shuffle">خلط من جديد</button>
+<button class="primary" id="play">▶ تشغيل</button>
+<button id="step">خطوة واحدة</button>
+<button id="shuffle">خلط</button>
+<button id="reset">إعادة</button>
 </div>
 
-<div class="speed">
-  <label for="speed">سرعة الحركة</label>
-  <input id="speed" type="range" min="1" max="5" value="3">
-  <span id="speedLabel">متوسطة</span>
+<div class="settings">
+<label>السرعة <input id="speed" type="range" min="1" max="10" value="5"></label>
+<label>عدد الشخصيات
+<select id="count">
+<option>5</option><option selected>7</option><option>9</option>
+</select>
+</label>
+<span id="speedLabel">متوسطة</span>
 </div>
 
-<div class="message" id="message">
-  اضغط ابدأ الترتيب وشاهد الخوارزمية.
+<div class="stats">
+<div class="stat"><small>المقارنات</small><strong id="comparisons">0</strong></div>
+<div class="stat"><small>عمليات التبديل</small><strong id="swaps">0</strong></div>
+<div class="stat"><small>المرور الحالي</small><strong id="pass">0</strong></div>
+<div class="stat"><small>الحالة</small><strong id="state" style="font-size:16px">جاهز</strong></div>
 </div>
-
-<div class="code">
-
-<span class="line" id="c1">
-<span class="kw">for</span> (let p = 0; p &lt; a.length - 1; p++) {
-</span>
-
-<span class="line" id="c2">
-  <span class="kw">for</span> (let i = 0; i &lt; a.length - 1 - p; i++) {
-</span>
-
-<span class="line" id="c3">
-    <span class="kw">if</span> (a[i] &gt; a[i + 1]) {
-</span>
-
-<span class="line" id="c4">
-      [a[i], a[i + 1]] = [a[i + 1], a[i]];
-</span>
-
-<span class="line" id="c5">    }</span>
-<span class="line" id="c6">  }</span>
-<span class="line" id="c7">}</span>
-
-</div>
-
 </section>
-</main>
+
+<div class="lower">
+<section class="box">
+<h3>كود Python المستخدم</h3>
+<div class="code" id="code">
+<span data-line="1">def bubble_sort(a):</span>
+<span data-line="2">    n = len(a)</span>
+<span data-line="3">    for p in range(n - 1):</span>
+<span data-line="4">        swapped = False</span>
+<span data-line="5">        for i in range(n - 1 - p):</span>
+<span data-line="6">            if a[i] &gt; a[i + 1]:</span>
+<span data-line="7">                a[i], a[i+1] = a[i+1], a[i]</span>
+<span data-line="8">                swapped = True</span>
+<span data-line="9">        if not swapped: break</span>
+</div>
+</section>
+
+<section class="box">
+<h3>شنو دا يصير؟</h3>
+<div id="explain">الخوارزمية تقارن كل عنصر بالعنصر اللي يمّه. إذا الأول أكبر، تبدّل أماكنهم. وتتكرر العملية لحد ما يصير الترتيب صحيح.</div>
+<p class="hint">كل شخصية تنتقل لموقعها الجديد عند التبديل.</p>
+</section>
+</div>
+</div>
 
 <script>
-
-const stage = document.getElementById("stage");
+(() => {
 const $ = id => document.getElementById(id);
+const track = $('track');
 
-let values = [1,4,9,3,2,6,5,8];
+let values = [], actors = [], i = 0, p = 0;
+let comparisons = 0, swaps = 0;
+let running = false, finished = false;
+let timer = null, stepBusy = false;
 
-let i = 0;
-let p = 0;
-let comparisons = 0;
-let swaps = 0;
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+const delay = () => Math.max(180, 1250 - (+$('speed').value) * 105);
 
-let running = false;
-let finished = false;
-let timer = null;
-
-const delay = () =>
-[1400,1100,850,650,560][$("speed").value - 1];
-
-const names = [
-"بطيئة جداً",
-"بطيئة",
-"متوسطة",
-"سريعة",
-"سريعة جداً"
-];
-
-$("speed").addEventListener("input", () => {
-  $("speedLabel").textContent =
-  names[$("speed").value - 1];
-});
-
-const nodes = new Map();
-
-/* إنشاء شخصية */
-
-function makePerson(v) {
-
-  const el = document.createElement("div");
-
-  el.className = "person";
-
-  el.innerHTML = `
-    <div class="num">${v}</div>
-
-    <div class="body">
-      <i class="eye"></i>
-      <i class="eye two"></i>
-      <i class="mouth"></i>
-      <div class="overalls"></div>
-    </div>
-
-    <div class="legs">
-      <i></i>
-      <i></i>
-    </div>
-  `;
-
-  return el;
+function setLine(n) {
+ document.querySelectorAll('.code span').forEach(s =>
+  s.classList.toggle('on', +s.dataset.line === n)
+ );
 }
 
-/* رسم الشخصيات وتحريكها بسلاسة */
-
-function draw(active = -1, second = -1) {
-
-  const oldPositions = new Map();
-
-  for (const v of values) {
-
-    const node = nodes.get(v);
-
-    if (node) {
-      oldPositions.set(
-        v,
-        node.getBoundingClientRect().left
-      );
-    }
-  }
-
-  for (const v of values) {
-
-    let el = nodes.get(v);
-
-    if (!el) {
-
-      el = makePerson(v);
-
-      nodes.set(v, el);
-
-      stage.appendChild(el);
-    }
-
-    el.style.order = values.indexOf(v);
-
-    el.querySelector(".num").textContent = v;
-
-    el.querySelector(".body").style.setProperty(
-      "--h",
-      (72 + v * 19) + "px"
-    );
-
-    el.classList.toggle(
-      "active",
-      values.indexOf(v) === active ||
-      values.indexOf(v) === second
-    );
-
-    el.classList.toggle("done", finished);
-  }
-
-  // FLIP Animation
-
-  for (const v of values) {
-
-    const el = nodes.get(v);
-
-    const before = oldPositions.get(v);
-
-    if (before === undefined) continue;
-
-    const after = el.getBoundingClientRect().left;
-
-    const delta = before - after;
-
-    if (Math.abs(delta) > 1) {
-
-      el.style.transition = "none";
-
-      el.style.transform =
-      `translateX(${delta}px)`;
-
-      el.getBoundingClientRect();
-
-      requestAnimationFrame(() => {
-
-        el.style.transition = "";
-
-        el.style.transform = "translateX(0)";
-
-      });
-    }
-  }
-
-  $("comparisons").textContent = comparisons;
-  $("swaps").textContent = swaps;
-  $("round").textContent = p + 1;
+function status(msg) {
+ $('status').textContent = msg;
 }
 
-/* تمييز سطر الكود */
-
-function highlight(line) {
-
-  for (let n = 1; n <= 7; n++) {
-
-    $("c" + n).classList.toggle(
-      "hot",
-      n === line
-    );
-  }
+function pos(index) {
+ return (6 + index * (88 / Math.max(1, values.length - 1))) + '%';
 }
 
-/* إيقاف */
+function render() {
+ track.innerHTML = '';
+ actors = [];
+
+ values.forEach((v, index) => {
+  const a = document.createElement('div');
+  a.className = 'actor';
+  a.style.left = pos(index);
+  a.style.setProperty('--h', (25 + v * 7) + '%');
+
+  a.innerHTML = `
+   <div class="number">${v}</div>
+   <div class="minion">
+    <div class="goggle"><div class="eye"></div></div>
+    <div class="mouth"></div>
+    <div class="overalls"></div>
+   </div>`;
+
+  track.appendChild(a);
+  actors.push(a);
+ });
+}
+
+function paint() {
+ actors.forEach((a, k) => {
+  a.style.left = pos(k);
+  a.querySelector('.number').textContent = values[k];
+ });
+}
+
+function stats() {
+ $('comparisons').textContent = comparisons;
+ $('swaps').textContent = swaps;
+ $('pass').textContent = Math.min(p + 1, values.length - 1);
+ $('state').textContent = finished ? 'مكتمل' : running ? 'يعمل' : 'متوقف';
+}
+
+function clearMarks() {
+ actors.forEach(a => a.classList.remove('active', 'swapping'));
+}
+
+function stopTimer() {
+ if (timer) {
+  clearTimeout(timer);
+  timer = null;
+ }
+}
 
 function stop() {
-
-  running = false;
-
-  clearTimeout(timer);
-
-  $("play").textContent = "▶ أكمل الترتيب";
+ running = false;
+ stopTimer();
+ $('play').textContent = '▶ تشغيل';
 }
 
-/* خطوة واحدة من الخوارزمية */
+function init() {
+ stop();
 
-function step() {
+ const n = +$('count').value;
+ values = Array.from({length:n}, (_, k) => k + 1)
+  .sort(() => Math.random() - .5);
 
-  if (finished) return;
+ i = 0;
+ p = 0;
+ comparisons = 0;
+ swaps = 0;
+ finished = false;
+ stepBusy = false;
 
-  if (i >= values.length - 1 - p) {
+ render();
+ paint();
+ setLine(1);
+ stats();
 
-    p++;
-
-    i = 0;
-
-    if (p >= values.length - 1) {
-
-      finished = true;
-
-      draw();
-
-      highlight(7);
-
-      $("message").textContent =
-      "🎉 أحسنت! صارت الأرقام مرتبة.";
-
-      stop();
-
-      $("play").disabled = true;
-
-      return;
-    }
-  }
-
-  comparisons++;
-
-  highlight(3);
-
-  const shouldSwap =
-  values[i] > values[i + 1];
-
-  if (shouldSwap) {
-
-    [values[i], values[i + 1]] =
-    [values[i + 1], values[i]];
-
-    swaps++;
-
-    highlight(4);
-
-    $("message").textContent =
-    "تم تبديل الشخصيتين!";
-  }
-
-  else {
-
-    $("message").textContent =
-    "لا نحتاج إلى تبديل.";
-  }
-
-  draw(i, shouldSwap ? i + 1 : -1);
-
-  i++;
+ $('explain').textContent = 'تم خلط الشخصيات. اضغط تشغيل حتى تبدأ المقارنات والتبديلات.';
+ status('جاهز — اضغط تشغيل');
+ $('play').textContent = '▶ تشغيل';
 }
 
-/* التشغيل التلقائي */
+function finish() {
+ finished = true;
+ running = false;
+ stopTimer();
 
-function play() {
+ actors.forEach(a => a.classList.add('sorted'));
 
-  if (finished) return;
+ $('play').textContent = '▶ تشغيل';
+ $('state').textContent = 'مكتمل';
+ setLine(9);
+ status('اكتمل الترتيب بنجاح ✓');
 
-  running = true;
-
-  $("play").textContent = "Ⅱ إيقاف مؤقت";
-
-  function tick() {
-
-    if (!running) return;
-
-    step();
-
-    if (running && !finished) {
-
-      timer = setTimeout(tick, delay());
-    }
-  }
-
-  tick();
+ $('explain').textContent = 'ممتاز! كل الشخصيات صارت مرتبة من الأصغر إلى الأكبر.';
 }
 
-/* زر التشغيل */
+async function oneStep() {
+ if (finished || stepBusy) return false;
 
-$("play").addEventListener("click", () => {
+ stepBusy = true;
 
-  running ? stop() : play();
+ if (p >= values.length - 1) {
+  finish();
+  stepBusy = false;
+  return false;
+ }
 
-});
-
-/* زر خطوة واحدة */
-
-$("step").addEventListener("click", () => {
-
-  stop();
-
-  step();
-
-});
-
-/* خلط الأرقام */
-
-$("shuffle").addEventListener("click", () => {
-
-  stop();
-
-  values = Array.from(
-    {length: 8},
-    (_, n) => n + 1
-  ).sort(() => Math.random() - 0.5);
-
+ if (i >= values.length - 1 - p) {
+  p++;
   i = 0;
-  p = 0;
+  setLine(3);
 
-  comparisons = 0;
-  swaps = 0;
+  if (p >= values.length - 1) {
+   finish();
+   stepBusy = false;
+   return false;
+  }
+ }
 
-  finished = false;
+ clearMarks();
 
-  $("play").disabled = false;
+ const left = actors[i];
+ const right = actors[i + 1];
 
-  $("play").textContent = "▶ ابدأ الترتيب";
+ left.classList.add('active');
+ right.classList.add('active');
 
-  $("message").textContent =
-  "تم خلط الأرقام. جاهز للتحدي؟";
+ comparisons++;
+ setLine(6);
 
-  highlight(0);
+ $('explain').textContent =
+  `مقارنة ${values[i]} مع ${values[i+1]}: ` +
+  (values[i] > values[i+1]
+   ? 'الأول أكبر، راح نبدّل أماكنهم.'
+   : 'الترتيب صحيح، نخليهم بمكانهم.');
 
-  draw();
+ status(`مقارنة العنصر ${i+1} مع ${i+2}`);
+ stats();
 
+ await wait(Math.min(250, delay() / 3));
+
+ if (values[i] > values[i + 1]) {
+  left.classList.add('swapping');
+  right.classList.add('swapping');
+  setLine(7);
+
+  const temp = values[i];
+  values[i] = values[i + 1];
+  values[i + 1] = temp;
+
+  left.style.left = pos(i + 1);
+  right.style.left = pos(i);
+
+  swaps++;
+  setLine(8);
+
+  $('explain').textContent = 'صار تبديل! لاحظ الشخصيتين تحركن وتبادلن أماكنهن.';
+
+  await wait(delay());
+
+  [actors[i], actors[i + 1]] = [actors[i + 1], actors[i]];
+
+  actors[i].style.left = pos(i);
+  actors[i + 1].style.left = pos(i + 1);
+
+  actors[i].classList.remove('swapping');
+  actors[i + 1].classList.remove('swapping');
+
+  paint();
+ } else {
+  await wait(Math.min(220, delay() / 2));
+ }
+
+ i++;
+ clearMarks();
+ stats();
+ stepBusy = false;
+
+ if (i >= values.length - 1 - p) {
+  p++;
+  i = 0;
+  setLine(3);
+
+  if (p >= values.length - 1) finish();
+ }
+
+ return !finished;
+}
+
+async function loop() {
+ if (!running || finished) return;
+
+ const keepGoing = await oneStep();
+
+ if (running && keepGoing) {
+  timer = setTimeout(loop, Math.max(80, delay() / 5));
+ }
+}
+
+$('play').addEventListener('click', () => {
+ if (running) {
+  stop();
+  status('متوقف مؤقتاً');
+  stats();
+  return;
+ }
+
+ if (finished) init();
+
+ running = true;
+ $('play').textContent = 'Ⅱ إيقاف';
+ status('الخوارزمية تعمل...');
+ stats();
+ loop();
 });
 
-/* بداية اللعبة */
+$('step').addEventListener('click', async () => {
+ if (running || stepBusy) return;
+ await oneStep();
+});
 
-draw();
+$('shuffle').addEventListener('click', init);
+$('reset').addEventListener('click', init);
+$('count').addEventListener('change', init);
 
+$('speed').addEventListener('input', () => {
+ const v = +$('speed').value;
+ $('speedLabel').textContent =
+  v < 4 ? 'بطيئة' : v > 7 ? 'سريعة' : 'متوسطة';
+});
+
+init();
+})();
 </script>
-
 </body>
 </html>
